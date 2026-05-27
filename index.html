@@ -3,1117 +3,798 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Equity Valuation Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.min.js"></script>
+<title>VALEX — Equity Valuation Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --surface2: #17171f;
-    --border: #2a2a3a;
-    --accent: #e8ff47;
-    --accent2: #47c8ff;
-    --accent3: #ff6b6b;
-    --accent4: #a78bfa;
-    --text: #f0f0f8;
-    --muted: #6b6b8a;
-    --green: #4ade80;
-    --red: #f87171;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  .noise {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.4;
-  }
-  .app { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 60px; }
+:root {
+  --bg:#0a0a0f; --surface:#111118; --surface2:#17171f; --border:#2a2a3a;
+  --accent:#e8ff47; --accent2:#47c8ff; --accent4:#a78bfa;
+  --text:#f0f0f8; --muted:#6b6b8a; --green:#4ade80; --red:#f87171;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;}
+a{color:var(--accent2);}
 
-  /* HEADER */
-  .header {
-    padding: 40px 0 32px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 32px;
-  }
-  .header-top { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px; font-weight: 800;
-    letter-spacing: -1px;
-    color: var(--accent);
-  }
-  .logo span { color: var(--text); }
-  .tagline { color: var(--muted); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+.app{max-width:1300px;margin:0 auto;padding:0 24px 80px;}
 
-  /* SEARCH */
-  .search-row { display: flex; gap: 12px; margin-top: 24px; }
-  .ticker-input {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    font-size: 22px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 14px 20px;
-    outline: none;
-    width: 200px;
-    transition: border-color 0.2s;
-  }
-  .ticker-input:focus { border-color: var(--accent); }
-  .ticker-input::placeholder { color: var(--muted); font-size: 16px; }
-  .analyze-btn {
-    background: var(--accent);
-    color: #0a0a0f;
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 14px 32px;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-  }
-  .analyze-btn:hover { opacity: 0.85; }
-  .analyze-btn:active { transform: scale(0.98); }
-  .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+/* HEADER */
+.header{padding:36px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.logo{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-1px;color:var(--accent);display:inline;}
+.logo span{color:var(--text);}
+.tagline{color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+.search-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+#tickerInput{
+  background:var(--surface);border:1px solid var(--border);color:var(--text);
+  font-family:'Syne',sans-serif;font-size:20px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  padding:12px 18px;outline:none;width:180px;transition:border-color .2s;
+}
+#tickerInput:focus{border-color:var(--accent);}
+#tickerInput::placeholder{color:var(--muted);font-size:14px;letter-spacing:1px;}
+#analyzeBtn{
+  background:var(--accent);color:#0a0a0f;border:none;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:12px 28px;cursor:pointer;transition:opacity .2s;
+}
+#analyzeBtn:hover{opacity:.85;}
+#analyzeBtn:disabled{opacity:.4;cursor:not-allowed;}
 
-  /* STATUS */
-  .status-bar {
-    padding: 10px 16px;
-    background: var(--surface);
-    border-left: 3px solid var(--accent2);
-    font-size: 12px;
-    color: var(--accent2);
-    margin-bottom: 24px;
-    letter-spacing: 1px;
-  }
-  .status-bar.error { border-color: var(--red); color: var(--red); }
-  .status-bar.warning { border-color: #fbbf24; color: #fbbf24; }
+/* STATUS */
+.status{padding:10px 14px;font-size:12px;margin-bottom:20px;letter-spacing:1px;border-left:3px solid var(--accent2);color:var(--accent2);background:var(--surface);}
+.status.err{border-color:var(--red);color:var(--red);}
+.status.warn{border-color:#fbbf24;color:#fbbf24;}
+.hidden{display:none!important;}
 
-  /* COMPANY HEADER */
-  .company-header {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 24px 28px;
-    margin-bottom: 24px;
-    display: flex; gap: 40px; flex-wrap: wrap; align-items: center;
-  }
-  .company-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px; font-weight: 800;
-    letter-spacing: -1px;
-  }
-  .company-ticker {
-    font-size: 13px; color: var(--accent);
-    letter-spacing: 3px; text-transform: uppercase;
-    margin-top: 2px;
-  }
-  .price-block { margin-left: auto; text-align: right; }
-  .current-price {
-    font-family: 'Syne', sans-serif;
-    font-size: 36px; font-weight: 800;
-    color: var(--accent);
-  }
-  .price-change { font-size: 13px; }
-  .up { color: var(--green); }
-  .down { color: var(--red); }
+/* COMPANY HEADER */
+.co-header{
+  background:var(--surface);border:1px solid var(--border);
+  padding:20px 24px;margin-bottom:20px;
+  display:flex;align-items:center;gap:32px;flex-wrap:wrap;
+}
+.co-name{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-1px;}
+.co-meta{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+.price-block{margin-left:auto;text-align:right;}
+.cur-price{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:var(--accent);}
+.price-chg{font-size:12px;margin-top:2px;}
+.up{color:var(--green);} .dn{color:var(--red);}
 
-  /* STAT PILLS */
-  .stat-pills { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
-  .pill {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 10px 18px;
-    flex: 1; min-width: 130px;
-  }
-  .pill-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
-  .pill-value { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
-  .pill-value.accent { color: var(--accent); }
-  .pill-value.accent2 { color: var(--accent2); }
-  .pill-value.accent4 { color: var(--accent4); }
+/* PILLS */
+.pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+.pill{background:var(--surface);border:1px solid var(--border);padding:10px 16px;flex:1;min-width:120px;}
+.pill-lbl{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+.pill-val{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;}
+.ca{color:var(--accent);} .ca2{color:var(--accent2);} .ca4{color:var(--accent4);}
 
-  /* TABS */
-  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
-  .tab {
-    padding: 12px 24px;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    background: none; border-top: none; border-left: none; border-right: none;
-  }
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;}
+.tab{
+  padding:11px 22px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;
+  border:none;border-bottom:2px solid transparent;background:none;transition:all .2s;
+}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-  /* SECTION */
-  .section { margin-bottom: 32px; }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* PANELS */
+.panel{display:none;} .panel.active{display:block;}
 
-  /* GRID */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+@media(max-width:860px){.g2,.g3{grid-template-columns:1fr;}}
 
-  /* CARDS */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 22px 24px;
-  }
-  .card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);padding:20px 22px;margin-bottom:18px;}
+.card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
 
-  /* TABLE */
-  .data-table { width: 100%; border-collapse: collapse; }
-  .data-table th {
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--muted); text-align: left;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-  }
-  .data-table td {
-    padding: 10px 12px;
-    font-size: 13px;
-    border-bottom: 1px solid rgba(42,42,58,0.5);
-  }
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table .num { text-align: right; font-family: 'DM Mono', monospace; }
-  .data-table .label { color: var(--muted); font-size: 12px; }
-  .highlight-row td { color: var(--accent); font-weight: 500; }
+/* TABLE */
+.dt{width:100%;border-collapse:collapse;}
+.dt th{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);}
+.dt td{padding:9px 10px;font-size:12px;border-bottom:1px solid rgba(42,42,58,.4);}
+.dt tr:last-child td{border-bottom:none;}
+.dt .nr{text-align:right;font-family:'DM Mono',monospace;}
+.dt .lb{color:var(--muted);font-size:11px;}
+.dt .hl td{color:var(--accent);font-weight:600;}
 
-  /* VALUATION RESULT */
-  .val-result {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    padding: 20px 24px;
-    margin-top: 16px;
-  }
-  .val-label { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-  .val-price {
-    font-family: 'Syne', sans-serif;
-    font-size: 42px; font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .val-upside { font-size: 14px; margin-top: 6px; }
+/* VAL RESULT */
+.vr{background:var(--surface2);border:1px solid var(--border);padding:18px 22px;margin-top:14px;}
+.vr-lbl{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
+.vr-price{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--accent);line-height:1;}
+.vr-sub{font-size:13px;margin-top:6px;color:var(--muted);}
 
-  /* CHART */
-  .chart-wrap { width: 100%; height: 220px; }
-  .recharts-tooltip-wrapper { font-size: 12px !important; }
+/* BADGE */
+.badge{display:inline-block;padding:2px 8px;font-size:10px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;}
+.bg{background:rgba(74,222,128,.15);color:var(--green);}
+.br{background:rgba(248,113,113,.15);color:var(--red);}
+.by{background:rgba(251,191,36,.15);color:#fbbf24;}
+.bb{background:rgba(71,200,255,.15);color:var(--accent2);}
 
-  /* GAUGE */
-  .gauge-row { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
-  .gauge-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .gauge-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
-  .gauge-label { font-size: 11px; color: var(--muted); width: 80px; text-align: right; }
+/* ASSUMPTION */
+.asgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.asfield label{display:block;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.asfield input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:7px 10px;outline:none;transition:border-color .2s;}
+.asfield input:focus{border-color:var(--accent);}
 
-  /* ASSUMPTION INPUT */
-  .assumption-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-  .assumption-field label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
-  .assumption-field input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    padding: 8px 12px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .assumption-field input:focus { border-color: var(--accent); }
-  .recalc-btn {
-    background: transparent;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-family: 'Syne', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 9px 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .recalc-btn:hover { background: var(--accent); color: #0a0a0f; }
+/* SVG CHARTS */
+.chart-svg{width:100%;overflow:visible;}
+.chart-wrap{width:100%;margin-top:6px;}
+.bar-fill{opacity:.85;transition:opacity .2s;}
+.bar-fill:hover{opacity:1;}
+.axis-line{stroke:var(--border);stroke-width:1;}
+.axis-label{fill:var(--muted);font-size:10px;font-family:'DM Mono',monospace;}
+.grid-line{stroke:var(--border);stroke-width:1;stroke-dasharray:3,3;}
 
-  /* SPINNER */
-  .spinner {
-    display: inline-block; width: 18px; height: 18px;
-    border: 2px solid var(--border); border-top-color: var(--accent);
-    border-radius: 50%; animation: spin 0.7s linear infinite;
-    margin-right: 8px; vertical-align: middle;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* GAUGE */
+.gauge-wrap{margin-bottom:12px;}
+.gauge-track{height:5px;background:var(--border);border-radius:3px;margin-top:5px;overflow:hidden;}
+.gauge-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+.gauge-row{display:flex;justify-content:space-between;font-size:11px;}
 
-  /* BADGE */
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
-    border-radius: 2px;
-  }
-  .badge-green { background: rgba(74,222,128,0.15); color: var(--green); }
-  .badge-red { background: rgba(248,113,113,0.15); color: var(--red); }
-  .badge-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
-  .badge-blue { background: rgba(71,200,255,0.15); color: var(--accent2); }
+/* SPINNER */
+.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes sp{to{transform:rotate(360deg);}}
 
-  .empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--muted);
-  }
-  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
-  .empty-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); opacity: 0.4; }
-  .empty-sub { font-size: 13px; }
+/* EMPTY */
+.empty{text-align:center;padding:80px 20px;color:var(--muted);}
+.empty-icon{font-size:40px;opacity:.2;margin-bottom:14px;}
+.empty-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;opacity:.3;margin-bottom:6px;color:var(--text);}
+.empty-sub{font-size:12px;}
 
-  .note { font-size: 11px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
-  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+.note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.7;}
+.divider{height:1px;background:var(--border);margin:16px 0;}
+.sec-title{font-size:10px;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 </style>
 </head>
 <body>
-<div class="noise"></div>
-<div id="root"></div>
+<div class="app">
 
-<script type="text/babel">
-const { useState, useEffect, useCallback } = React;
-const { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } = Recharts;
+  <!-- HEADER -->
+  <header class="header">
+    <div><span class="logo">VALE<span>X</span></span></div>
+    <div class="tagline">Equity Valuation Dashboard · Yahoo Finance Data</div>
+    <div class="search-row">
+      <input id="tickerInput" placeholder="TICKER" maxlength="10" autocomplete="off" spellcheck="false"/>
+      <button id="analyzeBtn" onclick="analyze()">ANALYSE →</button>
+    </div>
+  </header>
 
-// ── helpers ──────────────────────────────────────────────────────────────────
-const fmt = (n, decimals = 2) => n == null || isNaN(n) ? 'N/A' : Number(n).toFixed(decimals);
-const fmtB = (n) => {
-  if (n == null || isNaN(n)) return 'N/A';
-  if (Math.abs(n) >= 1e12) return (n / 1e12).toFixed(2) + 'T';
-  if (Math.abs(n) >= 1e9)  return (n / 1e9).toFixed(2) + 'B';
-  if (Math.abs(n) >= 1e6)  return (n / 1e6).toFixed(2) + 'M';
-  return n.toFixed(0);
+  <div id="statusBar" class="status hidden"></div>
+
+  <!-- EMPTY STATE -->
+  <div id="emptyState" class="empty">
+    <div class="empty-icon">◈</div>
+    <div class="empty-title">Enter a ticker to begin</div>
+    <div class="empty-sub">Any US-listed equity — e.g. AAPL, MSFT, TSLA, JPM, KO</div>
+  </div>
+
+  <!-- RESULTS (hidden until data loads) -->
+  <div id="results" class="hidden">
+    <div id="coHeader" class="co-header"></div>
+    <div id="pills" class="pills"></div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('overview',this)">Overview</button>
+      <button class="tab" onclick="switchTab('dcf',this)">DCF</button>
+      <button class="tab" onclick="switchTab('comps',this)">Comps</button>
+      <button class="tab" onclick="switchTab('ddm',this)">DDM</button>
+      <button class="tab" onclick="switchTab('assets',this)">Asset-Based</button>
+    </div>
+    <div id="tab-overview" class="panel active"></div>
+    <div id="tab-dcf"      class="panel"></div>
+    <div id="tab-comps"    class="panel"></div>
+    <div id="tab-ddm"      class="panel"></div>
+    <div id="tab-assets"   class="panel"></div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let D = null; // current stock data
+let A = { wacc:10, g1:15, g2:8, gt:2.5, y1:5, ke:10, dg:4 };
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+const fmt2  = n => (n==null||isNaN(n)) ? 'N/A' : (+n).toFixed(2);
+const fmtB  = n => {
+  if(n==null||isNaN(n)) return 'N/A';
+  const a=Math.abs(n);
+  if(a>=1e12) return (n/1e12).toFixed(2)+'T';
+  if(a>=1e9)  return (n/1e9).toFixed(2)+'B';
+  if(a>=1e6)  return (n/1e6).toFixed(2)+'M';
+  return (+n).toFixed(0);
 };
-const fmtPct = (n) => n == null || isNaN(n) ? 'N/A' : (n * 100).toFixed(1) + '%';
-const fmtMult = (n) => n == null || isNaN(n) || !isFinite(n) ? 'N/A' : n.toFixed(1) + 'x';
-const fmtPrice = (n) => n == null || isNaN(n) ? 'N/A' : '$' + Number(n).toFixed(2);
+const fmtP  = n => (n==null||isNaN(n)) ? 'N/A' : '$'+(+n).toFixed(2);
+const fmtPct= n => (n==null||isNaN(n)) ? 'N/A' : ((+n)*100).toFixed(1)+'%';
+const fmtMx = n => (n==null||isNaN(n)||!isFinite(n)) ? 'N/A' : (+n).toFixed(1)+'x';
+const safe  = (o,k) => o?.[k]?.raw ?? null;
 
-// Upside calc
-const upside = (iv, price) => {
-  if (!iv || !price || isNaN(iv) || isNaN(price)) return null;
-  return (iv - price) / price;
-};
+function upsideBadge(iv, price){
+  if(!iv||!price) return '';
+  const u=(iv-price)/price*100;
+  if(u>10)  return `<span class="badge bg">+${u.toFixed(1)}% UPSIDE</span>`;
+  if(u<-10) return `<span class="badge br">${u.toFixed(1)}% DOWNSIDE</span>`;
+  return `<span class="badge by">${u.toFixed(1)}% FAIRLY VALUED</span>`;
+}
 
-const upsideLabel = (u) => {
-  if (u == null) return null;
-  const pct = (u * 100).toFixed(1);
-  if (u > 0.1) return { text: `+${pct}% UPSIDE`, cls: 'badge-green' };
-  if (u < -0.1) return { text: `${pct}% DOWNSIDE`, cls: 'badge-red' };
-  return { text: `${pct}% FAIRLY VALUED`, cls: 'badge-yellow' };
-};
+// ── FETCH ─────────────────────────────────────────────────────────────────────
+const PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+];
 
-// CORS proxy for Yahoo Finance
-const PROXY = 'https://corsproxy.io/?';
-const YF = (path) => `${PROXY}${encodeURIComponent('https://query1.finance.yahoo.com' + path)}`;
+async function tryFetch(url){
+  for(const proxy of PROXIES){
+    try{
+      const r = await fetch(proxy(url), {signal: AbortSignal.timeout(10000)});
+      if(!r.ok) continue;
+      const j = await r.json();
+      if(j?.quoteSummary?.result) return j;
+    } catch(e){ continue; }
+  }
+  throw new Error('All proxies failed — Yahoo Finance may be rate-limiting. Please wait 30s and retry.');
+}
 
-async function fetchYahoo(ticker) {
+async function fetchStock(ticker){
   const t = ticker.toUpperCase();
+  const base = 'https://query1.finance.yahoo.com/v10/finance/quoteSummary/'+t;
 
-  const [summaryRes, cashflowRes, balanceRes, incomeRes] = await Promise.all([
-    fetch(YF(`/v10/finance/quoteSummary/${t}?modules=summaryDetail,defaultKeyStatistics,financialData,price,assetProfile`)),
-    fetch(YF(`/v10/finance/quoteSummary/${t}?modules=cashflowStatementHistory`)),
-    fetch(YF(`/v10/finance/quoteSummary/${t}?modules=balanceSheetHistory`)),
-    fetch(YF(`/v10/finance/quoteSummary/${t}?modules=incomeStatementHistory`)),
+  const [q1,q2,q3,q4] = await Promise.all([
+    tryFetch(base+'?modules=summaryDetail,defaultKeyStatistics,financialData,price,assetProfile'),
+    tryFetch(base+'?modules=cashflowStatementHistory'),
+    tryFetch(base+'?modules=balanceSheetHistory'),
+    tryFetch(base+'?modules=incomeStatementHistory'),
   ]);
 
-  const [summaryData, cashflowData, balanceData, incomeData] = await Promise.all([
-    summaryRes.json(), cashflowRes.json(), balanceRes.json(), incomeRes.json()
-  ]);
+  const r = q1.quoteSummary.result[0];
+  if(!r) throw new Error('Ticker not found.');
 
-  const q = summaryData.quoteSummary?.result?.[0];
-  if (!q) throw new Error('Ticker not found or API limit reached. Try again in a moment.');
-
-  const price = q.price || {};
-  const fin = q.financialData || {};
-  const keys = q.defaultKeyStatistics || {};
-  const detail = q.summaryDetail || {};
-  const profile = q.assetProfile || {};
-
-  const cfStatements = cashflowData.quoteSummary?.result?.[0]?.cashflowStatementHistory?.cashflowStatements || [];
-  const bsStatements = balanceData.quoteSummary?.result?.[0]?.balanceSheetHistory?.balanceSheetStatements || [];
-  const isStatements = incomeData.quoteSummary?.result?.[0]?.incomeStatementHistory?.incomeStatementHistory || [];
-
-  const v = (obj, key) => obj?.[key]?.raw ?? null;
+  const pr=r.price||{}, fin=r.financialData||{}, ks=r.defaultKeyStatistics||{}, sd=r.summaryDetail||{}, ap=r.assetProfile||{};
+  const cf=q2.quoteSummary.result[0]?.cashflowStatementHistory?.cashflowStatements||[];
+  const bs=q3.quoteSummary.result[0]?.balanceSheetHistory?.balanceSheetStatements||[];
+  const is=q4.quoteSummary.result[0]?.incomeStatementHistory?.incomeStatementHistory||[];
 
   return {
-    ticker: t,
-    name: price.longName || price.shortName || t,
-    sector: profile.sector || 'N/A',
-    industry: profile.industry || 'N/A',
-    currentPrice: v(price, 'regularMarketPrice'),
-    change: v(price, 'regularMarketChange'),
-    changePct: v(price, 'regularMarketChangePercent'),
-    marketCap: v(price, 'marketCap'),
-    enterpriseValue: v(keys, 'enterpriseValue'),
-    sharesOutstanding: v(keys, 'sharesOutstanding'),
-    // Income
-    revenue: v(fin, 'totalRevenue'),
-    revenueGrowth: v(fin, 'revenueGrowth'),
-    grossMargin: v(fin, 'grossMargins'),
-    ebitdaMargin: v(fin, 'ebitdaMargins'),
-    operatingMargin: v(fin, 'operatingMargins'),
-    profitMargin: v(fin, 'profitMargins'),
-    ebitda: v(fin, 'ebitda'),
-    // Cash flow
-    operatingCF: v(fin, 'operatingCashflow'),
-    freeCashFlow: v(fin, 'freeCashflow'),
-    // Balance sheet
-    totalCash: v(fin, 'totalCash'),
-    totalDebt: v(fin, 'totalDebt'),
-    bookValue: v(keys, 'bookValue'),
-    // Per share
-    eps: v(keys, 'trailingEps'),
-    forwardEps: v(keys, 'forwardEps'),
-    dividendRate: v(detail, 'dividendRate'),
-    dividendYield: v(detail, 'dividendYield'),
-    payoutRatio: v(keys, 'payoutRatio'),
-    // Multiples
-    peRatio: v(detail, 'trailingPE'),
-    forwardPE: v(detail, 'forwardPE'),
-    pbRatio: v(keys, 'priceToBook'),
-    psRatio: v(keys, 'priceToSalesTrailing12Months'),
-    evEbitda: v(keys, 'enterpriseToEbitda'),
-    evRevenue: v(keys, 'enterpriseToRevenue'),
-    pegRatio: v(keys, 'pegRatio'),
-    // Beta
-    beta: v(keys, 'beta'),
-    // Historical statements (last 4 years)
-    cashflows: cfStatements.map(s => ({
-      year: s.endDate?.fmt?.slice(0,4),
-      operatingCF: v(s, 'totalCashFromOperatingActivities'),
-      capex: v(s, 'capitalExpenditures'),
-      fcf: (v(s, 'totalCashFromOperatingActivities') || 0) + (v(s, 'capitalExpenditures') || 0),
+    ticker:t, name:pr.longName||pr.shortName||t,
+    sector:ap.sector||'N/A', industry:ap.industry||'N/A',
+    price:safe(pr,'regularMarketPrice'), change:safe(pr,'regularMarketChange'),
+    changePct:safe(pr,'regularMarketChangePercent'),
+    marketCap:safe(pr,'marketCap'), ev:safe(ks,'enterpriseValue'),
+    shares:safe(ks,'sharesOutstanding'),
+    revenue:safe(fin,'totalRevenue'), revGrowth:safe(fin,'revenueGrowth'),
+    grossMgn:safe(fin,'grossMargins'), ebitdaMgn:safe(fin,'ebitdaMargins'),
+    opMgn:safe(fin,'operatingMargins'), netMgn:safe(fin,'profitMargins'),
+    ebitda:safe(fin,'ebitda'), opCF:safe(fin,'operatingCashflow'),
+    fcf:safe(fin,'freeCashflow'), cash:safe(fin,'totalCash'),
+    debt:safe(fin,'totalDebt'), bookVal:safe(ks,'bookValue'),
+    eps:safe(ks,'trailingEps'), fwdEps:safe(ks,'forwardEps'),
+    divRate:safe(sd,'dividendRate'), divYield:safe(sd,'dividendYield'),
+    payoutRatio:safe(ks,'payoutRatio'), beta:safe(ks,'beta'),
+    pe:safe(sd,'trailingPE'), fwdPE:safe(sd,'forwardPE'),
+    pb:safe(ks,'priceToBook'), ps:safe(ks,'priceToSalesTrailing12Months'),
+    evEbitda:safe(ks,'enterpriseToEbitda'), evRev:safe(ks,'enterpriseToRevenue'),
+    peg:safe(ks,'pegRatio'),
+    cashflows: cf.map(s=>({
+      year:s.endDate?.fmt?.slice(0,4),
+      opCF:safe(s,'totalCashFromOperatingActivities'),
+      capex:safe(s,'capitalExpenditures'),
+      fcf:(safe(s,'totalCashFromOperatingActivities')||0)+(safe(s,'capitalExpenditures')||0)
     })).reverse(),
-    incomeHistory: isStatements.map(s => ({
-      year: s.endDate?.fmt?.slice(0,4),
-      revenue: v(s, 'totalRevenue'),
-      ebit: v(s, 'ebit'),
-      netIncome: v(s, 'netIncome'),
+    income: is.map(s=>({
+      year:s.endDate?.fmt?.slice(0,4),
+      rev:safe(s,'totalRevenue'), ni:safe(s,'netIncome')
     })).reverse(),
-    balanceHistory: bsStatements.map(s => ({
-      year: s.endDate?.fmt?.slice(0,4),
-      totalAssets: v(s, 'totalAssets'),
-      totalLiabilities: v(s, 'totalLiab'),
-      equity: v(s, 'totalStockholderEquity'),
-      cash: v(s, 'cash'),
-      debt: v(s, 'longTermDebt'),
+    balance: bs.map(s=>({
+      year:s.endDate?.fmt?.slice(0,4),
+      assets:safe(s,'totalAssets'), liab:safe(s,'totalLiab'),
+      equity:safe(s,'totalStockholderEquity')
     })).reverse(),
   };
 }
 
-// ── DCF Calculator ────────────────────────────────────────────────────────────
-function calcDCF(data, assumptions) {
-  const { wacc, growthRate1, growthRate2, terminalGrowth, years1 } = assumptions;
-  const fcf = data.freeCashFlow;
-  const shares = data.sharesOutstanding;
-  if (!fcf || !shares) return null;
+// ── ANALYZE ───────────────────────────────────────────────────────────────────
+async function analyze(){
+  const t = document.getElementById('tickerInput').value.trim();
+  if(!t) return;
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  setStatus('Fetching data…','');
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('results').classList.add('hidden');
 
-  const w = wacc / 100;
-  const g1 = growthRate1 / 100;
-  const g2 = growthRate2 / 100;
-  const gt = terminalGrowth / 100;
-  const y1 = parseInt(years1);
+  try{
+    D = await fetchStock(t);
+    renderAll();
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('statusBar').classList.add('hidden');
+  } catch(e){
+    setStatus('⚠ '+e.message,'err');
+    document.getElementById('emptyState').classList.remove('hidden');
+  } finally{
+    btn.disabled=false; btn.innerHTML='ANALYSE →';
+  }
+}
 
-  let cashFlows = [];
-  let cf = fcf;
-  let totalPV = 0;
+document.getElementById('tickerInput').addEventListener('keydown', e=>{ if(e.key==='Enter') analyze(); });
 
-  for (let i = 1; i <= 10; i++) {
-    const g = i <= y1 ? g1 : g2;
-    cf = cf * (1 + g);
-    const pv = cf / Math.pow(1 + w, i);
-    totalPV += pv;
-    cashFlows.push({ year: `Y${i}`, fcf: cf / 1e9, pv: pv / 1e9 });
+function setStatus(msg, cls){
+  const el=document.getElementById('statusBar');
+  el.className='status '+(cls||'');
+  el.innerHTML=msg;
+  el.classList.remove('hidden');
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────────────────────
+function switchTab(name, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── RENDER ALL ────────────────────────────────────────────────────────────────
+function renderAll(){
+  renderHeader();
+  renderPills();
+  renderOverview();
+  renderDCF();
+  renderComps();
+  renderDDM();
+  renderAssets();
+  switchTabById('overview');
+}
+
+function switchTabById(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelector(`.tab[onclick*="'${name}'"]`)?.classList.add('active');
+}
+
+// ── HEADER ────────────────────────────────────────────────────────────────────
+function renderHeader(){
+  const chgPct = D.changePct ? (D.changePct*100).toFixed(2) : '0.00';
+  const up = D.changePct >= 0;
+  document.getElementById('coHeader').innerHTML=`
+    <div>
+      <div class="co-name">${D.name}</div>
+      <div class="co-meta">${D.ticker} &middot; ${D.sector} &middot; ${D.industry}</div>
+    </div>
+    <div class="price-block">
+      <div class="cur-price">${fmtP(D.price)}</div>
+      <div class="price-chg ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(chgPct)}% today</div>
+    </div>`;
+}
+
+// ── PILLS ─────────────────────────────────────────────────────────────────────
+function renderPills(){
+  const netDebt = (D.debt||0)-(D.cash||0);
+  const items=[
+    ['Market Cap', fmtB(D.marketCap),'ca'],
+    ['EV', fmtB(D.ev),'ca'],
+    ['Revenue', fmtB(D.revenue),'ca2'],
+    ['Free Cash Flow', fmtB(D.fcf),'ca2'],
+    ['Net Debt', fmtB(netDebt),'ca4'],
+    ['Beta', fmt2(D.beta),'ca4'],
+  ];
+  document.getElementById('pills').innerHTML=items.map(([l,v,c])=>`
+    <div class="pill"><div class="pill-lbl">${l}</div><div class="pill-val ${c}">${v}</div></div>`).join('');
+}
+
+// ── SVG BAR CHART ─────────────────────────────────────────────────────────────
+function svgBars(data, keys, colors, yFmt){
+  if(!data||!data.length) return '<p class="note">No historical data available.</p>';
+  const W=560, H=180, PL=54, PR=10, PT=10, PB=28;
+  const cW=W-PL-PR, cH=H-PT-PB;
+  const n=data.length, bW=Math.floor((cW/n)*0.7/keys.length), gap=Math.floor((cW/n)*0.3);
+
+  const allVals = data.flatMap(d=>keys.map(k=>d[k]||0));
+  const minV=Math.min(0,...allVals), maxV=Math.max(...allVals);
+  const range=maxV-minV||1;
+  const scaleY=v=>(cH - (v-minV)/range*cH);
+  const barH=(v)=> Math.abs(v/range*cH);
+
+  let bars='', xLabels='', yLines='';
+  for(let i=0;i<5;i++){
+    const v=minV+(range/4)*i;
+    const y=PT+scaleY(v);
+    yLines+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" class="grid-line"/>`;
+    yLines+=`<text x="${PL-4}" y="${y+3}" class="axis-label" text-anchor="end">${yFmt?yFmt(v):fmtB(v)}</text>`;
   }
 
-  if (w <= gt) return null;
-  const terminalValue = (cf * (1 + gt)) / (w - gt);
-  const pvTerminal = terminalValue / Math.pow(1 + w, 10);
-  totalPV += pvTerminal;
-
-  const intrinsicValue = totalPV / shares;
-  return { intrinsicValue, pvTerminal: pvTerminal / 1e9, totalPV: totalPV / 1e9, cashFlows, terminalValue: terminalValue / 1e9 };
-}
-
-// ── DDM Calculator ─────────────────────────────────────────────────────────
-function calcDDM(data, assumptions) {
-  const { costOfEquity, ddmGrowth } = assumptions;
-  const d0 = data.dividendRate;
-  if (!d0 || d0 <= 0) return null;
-  const ke = costOfEquity / 100;
-  const g = ddmGrowth / 100;
-  if (ke <= g) return null;
-  const d1 = d0 * (1 + g);
-  const value = d1 / (ke - g);
-  return { value, d1, ke, g };
-}
-
-// ── TABS ──────────────────────────────────────────────────────────────────────
-const TABS = ['Overview', 'DCF', 'Comps', 'DDM', 'Asset-Based'];
-
-// ── MAIN APP ─────────────────────────────────────────────────────────────────
-function App() {
-  const [ticker, setTicker] = useState('');
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('Overview');
-  const [assumptions, setAssumptions] = useState({
-    wacc: 10,
-    growthRate1: 15,
-    growthRate2: 8,
-    terminalGrowth: 2.5,
-    years1: 5,
-    costOfEquity: 10,
-    ddmGrowth: 4,
+  data.forEach((d,i)=>{
+    const xBase=PL+i*(cW/n)+gap/2;
+    keys.forEach((k,ki)=>{
+      const v=d[k]||0;
+      const x=xBase+ki*(bW+2);
+      const h=barH(v);
+      const y=v>=0 ? PT+scaleY(v) : PT+scaleY(0);
+      bars+=`<rect class="bar-fill" x="${x}" y="${y}" width="${bW}" height="${h}" fill="${colors[ki]}" rx="1"/>`;
+    });
+    xLabels+=`<text x="${xBase+(bW*keys.length)/2}" y="${H-4}" class="axis-label" text-anchor="middle">${d.year||''}</text>`;
   });
 
-  const analyze = useCallback(async () => {
-    if (!ticker.trim()) return;
-    setLoading(true);
-    setError(null);
-    setData(null);
-    try {
-      const d = await fetchYahoo(ticker.trim());
-      setData(d);
-      setActiveTab('Overview');
-    } catch(e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [ticker]);
+  const legend=keys.map((k,i)=>`<text x="${PL+i*120}" y="${H+14}" class="axis-label" fill="${colors[i]}">■ ${k}</text>`).join('');
 
-  const handleKey = (e) => { if (e.key === 'Enter') analyze(); };
-  const updateAssumption = (key, val) => setAssumptions(a => ({ ...a, [key]: parseFloat(val) || 0 }));
+  return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H+16}" class="chart-svg">
+    ${yLines}
+    <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH}" class="axis-line"/>
+    <line x1="${PL}" y1="${PT+cH}" x2="${W-PR}" y2="${PT+cH}" class="axis-line"/>
+    ${bars}${xLabels}${legend}
+  </svg></div>`;
+}
 
-  return (
-    <div className="app">
-      <header className="header">
-        <div className="header-top">
-          <div className="logo">VALE<span>X</span></div>
-          <div className="tagline">Equity Valuation Dashboard</div>
-        </div>
-        <div className="search-row">
-          <input
-            className="ticker-input"
-            value={ticker}
-            onChange={e => setTicker(e.target.value.toUpperCase())}
-            onKeyDown={handleKey}
-            placeholder="TICKER"
-            maxLength={10}
-          />
-          <button className="analyze-btn" onClick={analyze} disabled={loading || !ticker.trim()}>
-            {loading ? <><span className="spinner"/></> : 'ANALYSE →'}
-          </button>
-        </div>
-      </header>
+function svgLine(data, key, color){
+  if(!data||!data.length) return '';
+  const W=560,H=160,PL=54,PR=10,PT=10,PB=28;
+  const cW=W-PL-PR,cH=H-PT-PB;
+  const vals=data.map(d=>d[key]||0);
+  const minV=Math.min(...vals),maxV=Math.max(...vals),range=maxV-minV||1;
+  const sx=(i)=>PL+i*(cW/(data.length-1||1));
+  const sy=(v)=>PT+cH-(v-minV)/range*cH;
 
-      {error && <div className="status-bar error">⚠ {error}</div>}
-      {loading && <div className="status-bar">Fetching data from Yahoo Finance…</div>}
+  let yLines='',pts='',dots='';
+  for(let i=0;i<5;i++){
+    const v=minV+(range/4)*i; const y=sy(v);
+    yLines+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" class="grid-line"/>`;
+    yLines+=`<text x="${PL-4}" y="${y+3}" class="axis-label" text-anchor="end">${fmtP(v)}</text>`;
+  }
+  data.forEach((d,i)=>{
+    if(i>0) pts+=`L${sx(i)},${sy(d[key]||0)}`;
+    else pts=`M${sx(0)},${sy(d[key]||0)}`;
+    dots+=`<circle cx="${sx(i)}" cy="${sy(d[key]||0)}" r="3" fill="${color}"/>`;
+    yLines+=`<text x="${sx(i)}" y="${H-4}" class="axis-label" text-anchor="middle">${d.year||''}</text>`;
+  });
 
-      {!data && !loading && !error && (
-        <div className="empty-state">
-          <div className="empty-icon">◈</div>
-          <div className="empty-title">Enter a ticker to begin</div>
-          <div className="empty-sub">Supports any equity listed on US exchanges — e.g. AAPL, MSFT, TSLA, JPM</div>
-        </div>
-      )}
+  return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" class="chart-svg">
+    ${yLines}
+    <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH}" class="axis-line"/>
+    <line x1="${PL}" y1="${PT+cH}" x2="${W-PR}" y2="${PT+cH}" class="axis-line"/>
+    <path d="${pts}" fill="none" stroke="${color}" stroke-width="2"/>
+    ${dots}
+  </svg></div>`;
+}
 
-      {data && (
-        <>
-          <CompanyHeader data={data} />
-          <StatPills data={data} />
-          <div className="tabs">
-            {TABS.map(t => (
-              <button key={t} className={`tab ${activeTab === t ? 'active' : ''}`} onClick={() => setActiveTab(t)}>{t}</button>
-            ))}
-          </div>
-
-          {activeTab === 'Overview'   && <OverviewTab data={data} />}
-          {activeTab === 'DCF'        && <DCFTab data={data} assumptions={assumptions} updateAssumption={updateAssumption} />}
-          {activeTab === 'Comps'      && <CompsTab data={data} />}
-          {activeTab === 'DDM'        && <DDMTab data={data} assumptions={assumptions} updateAssumption={updateAssumption} />}
-          {activeTab === 'Asset-Based'&& <AssetTab data={data} />}
-        </>
-      )}
+// ── OVERVIEW ──────────────────────────────────────────────────────────────────
+function renderOverview(){
+  document.getElementById('tab-overview').innerHTML=`
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Income & Margins</div>
+      <table class="dt"><tbody>
+        ${rows([
+          ['Revenue', fmtB(D.revenue)],
+          ['Revenue Growth (YoY)', fmtPct(D.revGrowth)],
+          ['Gross Margin', fmtPct(D.grossMgn)],
+          ['EBITDA Margin', fmtPct(D.ebitdaMgn)],
+          ['Operating Margin', fmtPct(D.opMgn)],
+          ['Net Margin', fmtPct(D.netMgn)],
+        ])}
+      </tbody></table>
     </div>
-  );
-}
-
-// ── COMPANY HEADER ────────────────────────────────────────────────────────────
-function CompanyHeader({ data }) {
-  const chg = data.changePct;
-  return (
-    <div className="company-header">
-      <div>
-        <div className="company-name">{data.name}</div>
-        <div className="company-ticker">{data.ticker} · {data.sector} · {data.industry}</div>
-      </div>
-      <div className="price-block">
-        <div className="current-price">{fmtPrice(data.currentPrice)}</div>
-        <div className={`price-change ${chg >= 0 ? 'up' : 'down'}`}>
-          {chg >= 0 ? '▲' : '▼'} {Math.abs((chg * 100)).toFixed(2)}% today
-        </div>
-      </div>
+    <div class="card">
+      <div class="card-title">Balance Sheet</div>
+      <table class="dt"><tbody>
+        ${rows([
+          ['Total Cash', fmtB(D.cash)],
+          ['Total Debt', fmtB(D.debt)],
+          ['Net Debt / (Cash)', fmtB((D.debt||0)-(D.cash||0))],
+          ['Book Value / Share', fmtP(D.bookVal)],
+          ['Operating Cash Flow', fmtB(D.opCF)],
+          ['Free Cash Flow', fmtB(D.fcf)],
+        ])}
+      </tbody></table>
     </div>
-  );
+  </div>
+  <div class="card">
+    <div class="card-title">Historical Revenue & Net Income</div>
+    ${svgBars(D.income,['rev','ni'],['#47c8ff','#e8ff47'])}
+  </div>
+  <div class="card">
+    <div class="card-title">Historical Free Cash Flow</div>
+    ${svgBars(D.cashflows,['opCF','fcf'],['#a78bfa','#e8ff47'])}
+  </div>`;
 }
 
-// ── STAT PILLS ────────────────────────────────────────────────────────────────
-function StatPills({ data }) {
-  const pills = [
-    { label: 'Market Cap', value: fmtB(data.marketCap), cls: 'accent' },
-    { label: 'EV', value: fmtB(data.enterpriseValue), cls: 'accent' },
-    { label: 'Revenue', value: fmtB(data.revenue), cls: 'accent2' },
-    { label: 'Free Cash Flow', value: fmtB(data.freeCashFlow), cls: 'accent2' },
-    { label: 'Net Debt', value: fmtB((data.totalDebt || 0) - (data.totalCash || 0)), cls: 'accent4' },
-    { label: 'Beta', value: fmt(data.beta), cls: 'accent4' },
-  ];
-  return (
-    <div className="stat-pills">
-      {pills.map(p => (
-        <div className="pill" key={p.label}>
-          <div className="pill-label">{p.label}</div>
-          <div className={`pill-value ${p.cls}`}>{p.value}</div>
-        </div>
-      ))}
+function rows(arr){
+  return arr.map(([l,v])=>`<tr><td class="lb">${l}</td><td class="nr">${v}</td></tr>`).join('');
+}
+
+// ── DCF ───────────────────────────────────────────────────────────────────────
+function renderDCF(){
+  const el=document.getElementById('tab-dcf');
+  el.innerHTML=dcfHTML();
+}
+
+function dcfHTML(){
+  const res=calcDCF();
+  const noFCF = !D.fcf;
+
+  let resultHTML='';
+  if(noFCF){
+    resultHTML='<div class="status warn">⚠ Free cash flow not available — DCF cannot be computed.</div>';
+  } else if(res){
+    resultHTML=`
+    <div class="vr">
+      <div class="vr-lbl">DCF Intrinsic Value / Share</div>
+      <div class="vr-price">${fmtP(res.iv)}</div>
+      <div class="vr-sub">vs. ${fmtP(D.price)} current &nbsp; ${upsideBadge(res.iv,D.price)}</div>
     </div>
-  );
-}
+    <div class="card" style="margin-top:14px">
+      <div class="card-title">Value Breakdown</div>
+      <table class="dt"><tbody>
+        <tr><td class="lb">PV of FCFs (10yr)</td><td class="nr">$${fmt2((res.totalPV-res.pvTV)/1e9)}B</td></tr>
+        <tr><td class="lb">PV of Terminal Value</td><td class="nr">$${fmt2(res.pvTV/1e9)}B</td></tr>
+        <tr class="hl"><td class="lb">Total Equity Value</td><td class="nr">$${fmt2(res.totalPV/1e9)}B</td></tr>
+        <tr><td class="lb">Implied / Share</td><td class="nr">${fmtP(res.iv)}</td></tr>
+      </tbody></table>
+      <p class="note">⚠ Uses LTM FCF as the base. Terminal value typically = 50–70% of total DCF value. Treat assumptions with care.</p>
+    </div>`;
+  } else {
+    resultHTML='<div class="status err">⚠ WACC must exceed terminal growth rate.</div>';
+  }
 
-// ── OVERVIEW TAB ──────────────────────────────────────────────────────────────
-function OverviewTab({ data }) {
-  return (
-    <>
-      <div className="grid-2">
-        <div className="card">
-          <div className="card-title">Income & Margins</div>
-          <table className="data-table">
-            <tbody>
-              {[
-                ['Revenue', fmtB(data.revenue)],
-                ['Revenue Growth (YoY)', fmtPct(data.revenueGrowth)],
-                ['Gross Margin', fmtPct(data.grossMargin)],
-                ['EBITDA Margin', fmtPct(data.ebitdaMargin)],
-                ['Operating Margin', fmtPct(data.operatingMargin)],
-                ['Net Margin', fmtPct(data.profitMargin)],
-              ].map(([l,v]) => (
-                <tr key={l}><td className="label">{l}</td><td className="num">{v}</td></tr>
-              ))}
-            </tbody>
-          </table>
+  const chartHTML = res ? `
+    <div class="card">
+      <div class="card-title">Projected PV of FCF (10 Years, $B)</div>
+      ${svgBars(res.cfs,['pv'],['#e8ff47'],(v=>v.toFixed(1)+'B'))}
+    </div>` : '';
+
+  return `<div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-title">Assumptions</div>
+        <div class="asgrid">
+          ${asField('WACC (%)','wacc',0.5)}
+          ${asField('Phase 1 FCF Growth (%)','g1',1)}
+          ${asField('Phase 1 Years','y1',1)}
+          ${asField('Phase 2 FCF Growth (%)','g2',1)}
+          ${asField('Terminal Growth (%)','gt',0.1)}
         </div>
-        <div className="card">
-          <div className="card-title">Balance Sheet Snapshot</div>
-          <table className="data-table">
-            <tbody>
-              {[
-                ['Total Cash', fmtB(data.totalCash)],
-                ['Total Debt', fmtB(data.totalDebt)],
-                ['Net Debt', fmtB((data.totalDebt || 0) - (data.totalCash || 0))],
-                ['Book Value / Share', fmtPrice(data.bookValue)],
-                ['Operating Cash Flow', fmtB(data.operatingCF)],
-                ['Free Cash Flow', fmtB(data.freeCashFlow)],
-              ].map(([l,v]) => (
-                <tr key={l}><td className="label">{l}</td><td className="num">{v}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {data.incomeHistory?.length > 0 && (
-        <div className="section" style={{marginTop: 24}}>
-          <div className="section-title">Historical Revenue & Net Income</div>
-          <div className="card">
-            <div className="chart-wrap">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.incomeHistory} margin={{top:5, right:20, left:0, bottom:5}}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
-                  <XAxis dataKey="year" tick={{fill:'#6b6b8a', fontSize:11}} />
-                  <YAxis tickFormatter={v => fmtB(v)} tick={{fill:'#6b6b8a', fontSize:11}} />
-                  <Tooltip formatter={(v) => fmtB(v)} contentStyle={{background:'#17171f', border:'1px solid #2a2a3a', borderRadius:0}} />
-                  <Bar dataKey="revenue" fill="#47c8ff" name="Revenue" />
-                  <Bar dataKey="netIncome" fill="#e8ff47" name="Net Income" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {data.cashflows?.length > 0 && (
-        <div className="section" style={{marginTop: 24}}>
-          <div className="section-title">Historical Free Cash Flow</div>
-          <div className="card">
-            <div className="chart-wrap">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.cashflows} margin={{top:5, right:20, left:0, bottom:5}}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
-                  <XAxis dataKey="year" tick={{fill:'#6b6b8a', fontSize:11}} />
-                  <YAxis tickFormatter={v => fmtB(v)} tick={{fill:'#6b6b8a', fontSize:11}} />
-                  <Tooltip formatter={(v) => fmtB(v)} contentStyle={{background:'#17171f', border:'1px solid #2a2a3a', borderRadius:0}} />
-                  <Bar dataKey="operatingCF" fill="#a78bfa" name="Operating CF" />
-                  <Bar dataKey="fcf" fill="#e8ff47" name="Free CF" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-// ── DCF TAB ───────────────────────────────────────────────────────────────────
-function DCFTab({ data, assumptions, updateAssumption }) {
-  const result = calcDCF(data, assumptions);
-  const u = result ? upside(result.intrinsicValue, data.currentPrice) : null;
-  const badge = upsideLabel(u);
-
-  return (
-    <div className="grid-2">
-      <div>
-        <div className="card">
-          <div className="card-title">DCF Assumptions</div>
-          <div className="assumption-grid">
-            {[
-              { key: 'wacc', label: 'WACC (%)', step: 0.5 },
-              { key: 'growthRate1', label: 'Phase 1 FCF Growth (%)', step: 1 },
-              { key: 'years1', label: 'Phase 1 Years', step: 1 },
-              { key: 'growthRate2', label: 'Phase 2 FCF Growth (%)', step: 1 },
-              { key: 'terminalGrowth', label: 'Terminal Growth (%)', step: 0.1 },
-            ].map(f => (
-              <div className="assumption-field" key={f.key}>
-                <label>{f.label}</label>
-                <input type="number" value={assumptions[f.key]} step={f.step}
-                  onChange={e => updateAssumption(f.key, e.target.value)} />
-              </div>
-            ))}
-          </div>
-          <div className="divider" />
-          <div className="section-title" style={{marginBottom:8}}>Base Inputs</div>
-          <table className="data-table">
-            <tbody>
-              {[
-                ['LTM Free Cash Flow', fmtB(data.freeCashFlow)],
-                ['Shares Outstanding', fmtB(data.sharesOutstanding)],
-                ['Current Price', fmtPrice(data.currentPrice)],
-              ].map(([l,v]) => (
-                <tr key={l}><td className="label">{l}</td><td className="num">{v}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {!data.freeCashFlow && (
-          <div className="status-bar warning" style={{marginTop:12}}>⚠ Free cash flow not available — DCF cannot be computed.</div>
-        )}
-
-        {result && (
-          <div className="val-result">
-            <div className="val-label">DCF Intrinsic Value / Share</div>
-            <div className="val-price">{fmtPrice(result.intrinsicValue)}</div>
-            <div className="val-upside">
-              vs. {fmtPrice(data.currentPrice)} current &nbsp;
-              {badge && <span className={`badge ${badge.cls}`}>{badge.text}</span>}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div>
-        {result && (
-          <>
-            <div className="card">
-              <div className="card-title">Projected FCF (10 Years, $B)</div>
-              <div className="chart-wrap">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={result.cashFlows} margin={{top:5, right:20, left:0, bottom:5}}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
-                    <XAxis dataKey="year" tick={{fill:'#6b6b8a', fontSize:11}} />
-                    <YAxis tick={{fill:'#6b6b8a', fontSize:11}} />
-                    <Tooltip formatter={v => `$${v.toFixed(2)}B`} contentStyle={{background:'#17171f', border:'1px solid #2a2a3a', borderRadius:0}} />
-                    <Bar dataKey="pv" fill="#e8ff47" name="PV of FCF" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-            <div className="card" style={{marginTop:16}}>
-              <div className="card-title">Value Breakdown</div>
-              <table className="data-table">
-                <tbody>
-                  <tr><td className="label">PV of FCFs (10yr)</td><td className="num">${fmt(result.totalPV - result.pvTerminal)}B</td></tr>
-                  <tr><td className="label">PV of Terminal Value</td><td className="num">${fmt(result.pvTerminal)}B</td></tr>
-                  <tr className="highlight-row"><td className="label">Total Enterprise Value</td><td className="num">${fmt(result.totalPV)}B</td></tr>
-                  <tr><td className="label">Implied Price / Share</td><td className="num">{fmtPrice(result.intrinsicValue)}</td></tr>
-                </tbody>
-              </table>
-              <p className="note">⚠ Uses LTM FCF as the base. Terminal value typically represents 50–70% of total DCF value — treat assumptions with care.</p>
-            </div>
-          </>
-        )}
+        <div class="divider"></div>
+        <div class="sec-title">Base Inputs</div>
+        <table class="dt"><tbody>
+          ${rows([
+            ['LTM Free Cash Flow', fmtB(D.fcf)],
+            ['Shares Outstanding', fmtB(D.shares)],
+            ['Current Price', fmtP(D.price)],
+          ])}
+        </tbody></table>
+        ${resultHTML}
       </div>
     </div>
-  );
+    <div>${chartHTML}</div>
+  </div>`;
 }
 
-// ── COMPS TAB ─────────────────────────────────────────────────────────────────
-function CompsTab({ data }) {
-  const multiples = [
-    { label: 'Trailing P/E', value: data.peRatio, type: 'equity' },
-    { label: 'Forward P/E', value: data.forwardPE, type: 'equity' },
-    { label: 'PEG Ratio', value: data.pegRatio, type: 'equity' },
-    { label: 'Price / Book', value: data.pbRatio, type: 'equity' },
-    { label: 'Price / Sales', value: data.psRatio, type: 'equity' },
-    { label: 'EV / Revenue', value: data.evRevenue, type: 'ev' },
-    { label: 'EV / EBITDA', value: data.evEbitda, type: 'ev' },
+function calcDCF(){
+  const fcf=D.fcf, shares=D.shares;
+  if(!fcf||!shares) return null;
+  const w=A.wacc/100, g1=A.g1/100, g2=A.g2/100, gt=A.gt/100, y1=parseInt(A.y1);
+  if(w<=gt) return null;
+  let cf=fcf, totalPV=0, cfs=[];
+  for(let i=1;i<=10;i++){
+    cf*=(1+(i<=y1?g1:g2));
+    const pv=cf/Math.pow(1+w,i);
+    totalPV+=pv;
+    cfs.push({year:`Y${i}`,pv:pv/1e9});
+  }
+  const tv=(cf*(1+gt))/(w-gt);
+  const pvTV=tv/Math.pow(1+w,10);
+  totalPV+=pvTV;
+  return {iv:totalPV/shares, totalPV, pvTV, cfs};
+}
+
+function asField(label,key,step){
+  return `<div class="asfield">
+    <label>${label}</label>
+    <input type="number" step="${step}" value="${A[key]}" onchange="A['${key}']=parseFloat(this.value)||0;renderDCF();renderDDM();">
+  </div>`;
+}
+
+// ── COMPS ─────────────────────────────────────────────────────────────────────
+const SECTOR_BENCH={
+  'Technology':{pe:28,evEb:18,evR:6,pb:8},
+  'Healthcare':{pe:22,evEb:14,evR:4,pb:5},
+  'Financials':{pe:13,evEb:10,evR:3,pb:1.5},
+  'Consumer Cyclical':{pe:20,evEb:12,evR:2,pb:4},
+  'Communication Services':{pe:18,evEb:10,evR:3,pb:3},
+  'Energy':{pe:12,evEb:7,evR:1.5,pb:2},
+  'Industrials':{pe:20,evEb:13,evR:2,pb:4},
+  'Consumer Defensive':{pe:22,evEb:14,evR:2,pb:5},
+  'Utilities':{pe:18,evEb:11,evR:3,pb:2},
+  'Real Estate':{pe:35,evEb:20,evR:8,pb:2},
+  'Basic Materials':{pe:16,evEb:10,evR:2,pb:3},
+};
+
+function renderComps(){
+  const bench=SECTOR_BENCH[D.sector]||{pe:20,evEb:12,evR:3,pb:4};
+  const implPE=D.eps&&bench.pe ? D.eps*bench.pe : null;
+  const implFwd=D.fwdEps&&bench.pe ? D.fwdEps*bench.pe : null;
+
+  const multData=[
+    ['Trailing P/E', D.pe, 'equity'],
+    ['Forward P/E', D.fwdPE, 'equity'],
+    ['PEG Ratio', D.peg, 'equity'],
+    ['Price / Book', D.pb, 'equity'],
+    ['Price / Sales', D.ps, 'equity'],
+    ['EV / Revenue', D.evRev, 'ev'],
+    ['EV / EBITDA', D.evEbitda, 'ev'],
   ];
 
-  // implied prices from multiples
-  const sectorBenchmarks = {
-    'Technology': { pe: 28, evEbitda: 18, evRev: 6, pb: 8 },
-    'Healthcare': { pe: 22, evEbitda: 14, evRev: 4, pb: 5 },
-    'Financials': { pe: 13, evEbitda: 10, evRev: 3, pb: 1.5 },
-    'Consumer Cyclical': { pe: 20, evEbitda: 12, evRev: 2, pb: 4 },
-    'Communication Services': { pe: 18, evEbitda: 10, evRev: 3, pb: 3 },
-    'Energy': { pe: 12, evEbitda: 7, evRev: 1.5, pb: 2 },
-    'Industrials': { pe: 20, evEbitda: 13, evRev: 2, pb: 4 },
-    'Consumer Defensive': { pe: 22, evEbitda: 14, evRev: 2, pb: 5 },
-    'Utilities': { pe: 18, evEbitda: 11, evRev: 3, pb: 2 },
-    'Real Estate': { pe: 35, evEbitda: 20, evRev: 8, pb: 2 },
-    'Basic Materials': { pe: 16, evEbitda: 10, evRev: 2, pb: 3 },
-  };
+  const compRows=[
+    ['P/E', D.pe, bench.pe],
+    ['EV/EBITDA', D.evEbitda, bench.evEb],
+    ['EV/Revenue', D.evRev, bench.evR],
+    ['P/B', D.pb, bench.pb],
+  ];
 
-  const bench = sectorBenchmarks[data.sector] || { pe: 20, evEbitda: 12, evRev: 3, pb: 4 };
+  document.getElementById('tab-comps').innerHTML=`
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Trading Multiples</div>
+      <table class="dt">
+        <thead><tr><th>Multiple</th><th class="nr">Value</th><th class="nr">Type</th></tr></thead>
+        <tbody>
+          ${multData.map(([l,v,t])=>`<tr>
+            <td class="lb">${l}</td>
+            <td class="nr">${fmtMx(v)}</td>
+            <td class="nr"><span class="badge ${t==='equity'?'bb':'by'}">${t==='equity'?'Equity':'EV'}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">vs. Sector Averages (${D.sector})</div>
+      <table class="dt">
+        <thead><tr><th>Multiple</th><th class="nr">Company</th><th class="nr">Sector Avg</th></tr></thead>
+        <tbody>
+          ${compRows.map(([l,co,se])=>{
+            const high=co&&se&&co>se;
+            return `<tr><td class="lb">${l}</td><td class="nr ${high?'dn':'up'}">${fmtMx(co)}</td><td class="nr">${fmtMx(se)}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <p class="note">Sector averages are broad estimates for directional context only. A real comps analysis requires a curated peer set.</p>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Implied Prices — Sector Avg P/E (${fmtMx(bench.pe)})</div>
+      ${[['Trailing EPS × Sector P/E', implPE, D.eps],['Forward EPS × Sector P/E', implFwd, D.fwdEps]].map(([label,imp,eps])=>`
+        <div style="margin-bottom:18px">
+          <div class="vr-lbl">${label}</div>
+          ${imp ? `
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent)">${fmtP(imp)}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">EPS ${fmtP(eps)} × ${fmtMx(bench.pe)} &nbsp; ${upsideBadge(imp,D.price)}</div>
+          ` : `<div style="color:var(--muted);font-size:12px">EPS not available</div>`}
+        </div>`).join('')}
+      <p class="note">Indicative figures only. True comps analysis requires a peer set.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Key Ratios at a Glance</div>
+      ${[
+        ['P/E vs Sector', D.pe, bench.pe, 50],
+        ['EV/EBITDA vs Sector', D.evEbitda, bench.evEb, 30],
+        ['P/B vs Sector', D.pb, bench.pb, 20],
+      ].map(([l,v,b,max])=>{
+        const pct=v ? Math.min(v/max*100,100) : 0;
+        const bpct=b ? Math.min(b/max*100,100) : 0;
+        return `<div class="gauge-wrap">
+          <div class="gauge-row"><span>${l}</span><span>${fmtMx(v)}</span></div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:${pct}%;background:${v>b?'var(--red)':'var(--green)'}"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Sector avg: ${fmtMx(b)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
 
-  const impliedFromPE = data.eps && bench.pe ? data.eps * bench.pe : null;
-  const impliedFromFwdPE = data.forwardEps && bench.pe ? data.forwardEps * bench.pe : null;
+// ── DDM ───────────────────────────────────────────────────────────────────────
+function renderDDM(){
+  const el=document.getElementById('tab-ddm');
+  el.innerHTML=ddmHTML();
+}
 
-  const chartData = multiples.filter(m => m.value && isFinite(m.value)).map(m => ({
-    name: m.label, value: parseFloat(m.value.toFixed(1))
+function ddmHTML(){
+  const hasDiv=D.divRate&&D.divRate>0;
+  if(!hasDiv) return `
+    <div class="card">
+      <div class="card-title">Gordon Growth Model (DDM)</div>
+      <div class="status warn" style="margin-bottom:12px">⚠ ${D.name} does not pay a dividend — DDM is not applicable.</div>
+      <p class="note">DDM suits mature dividend-paying companies (utilities, consumer staples, large banks). Use DCF or Comps for this stock.</p>
+    </div>`;
+
+  const ke=A.ke/100, g=A.dg/100;
+  const valid=ke>g;
+  const d1=D.divRate*(1+g);
+  const val=valid ? d1/(ke-g) : null;
+
+  const growData=Array.from({length:10},(_,i)=>({
+    year:`Y${i+1}`, div:D.divRate*Math.pow(1+g,i+1)
   }));
 
-  return (
-    <>
-      <div className="grid-2">
-        <div className="card">
-          <div className="card-title">Trading Multiples</div>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Multiple</th>
-                <th className="num">Value</th>
-                <th className="num">Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {multiples.map(m => (
-                <tr key={m.label}>
-                  <td className="label">{m.label}</td>
-                  <td className="num">{m.value ? fmtMult(m.value) : 'N/A'}</td>
-                  <td className="num">
-                    <span className={`badge ${m.type === 'equity' ? 'badge-blue' : 'badge-yellow'}`}>
-                      {m.type === 'equity' ? 'Equity' : 'EV'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="card">
-          <div className="card-title">Sector Benchmarks ({data.sector})</div>
-          <table className="data-table">
-            <thead>
-              <tr><th>Multiple</th><th className="num">Company</th><th className="num">Sector Avg</th></tr>
-            </thead>
-            <tbody>
-              {[
-                ['P/E', data.peRatio, bench.pe],
-                ['EV/EBITDA', data.evEbitda, bench.evEbitda],
-                ['EV/Revenue', data.evRevenue, bench.evRev],
-                ['P/B', data.pbRatio, bench.pb],
-              ].map(([l, co, se]) => {
-                const isHigh = co && se && co > se;
-                return (
-                  <tr key={l}>
-                    <td className="label">{l}</td>
-                    <td className={`num ${isHigh ? 'down' : 'up'}`}>{fmtMult(co)}</td>
-                    <td className="num">{fmtMult(se)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <p className="note">Sector averages are broad estimates for context. Use a real peer set for proper comps analysis.</p>
-        </div>
-      </div>
-
-      <div className="grid-2" style={{marginTop: 20}}>
-        <div className="card">
-          <div className="card-title">Multiples Chart</div>
-          {chartData.length > 0 ? (
-            <div className="chart-wrap">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} layout="vertical" margin={{top:5, right:20, left:90, bottom:5}}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
-                  <XAxis type="number" tick={{fill:'#6b6b8a', fontSize:11}} />
-                  <YAxis type="category" dataKey="name" tick={{fill:'#6b6b8a', fontSize:10}} width={90} />
-                  <Tooltip contentStyle={{background:'#17171f', border:'1px solid #2a2a3a', borderRadius:0}} />
-                  <Bar dataKey="value" fill="#47c8ff" name="Value">
-                    {chartData.map((_, i) => <Cell key={i} fill={i % 2 === 0 ? '#47c8ff' : '#a78bfa'} />)}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : <p className="note">No multiples data available.</p>}
-        </div>
-
-        <div className="card">
-          <div className="card-title">Implied Prices (Sector Avg P/E)</div>
-          {[
-            ['Trailing EPS × Sector P/E', impliedFromPE, data.eps],
-            ['Forward EPS × Sector P/E', impliedFromFwdPE, data.forwardEps],
-          ].map(([label, implied, eps]) => {
-            if (!implied) return (
-              <div key={label} style={{marginBottom:16}}>
-                <div className="val-label">{label}</div>
-                <div style={{color:'var(--muted)', fontSize:13}}>EPS not available</div>
-              </div>
-            );
-            const u = upside(implied, data.currentPrice);
-            const badge = upsideLabel(u);
-            return (
-              <div key={label} style={{marginBottom: 20}}>
-                <div className="val-label">{label}</div>
-                <div className="val-price" style={{fontSize:30}}>{fmtPrice(implied)}</div>
-                <div className="val-upside">
-                  EPS {fmtPrice(eps)} × {fmtMult(bench.pe)} &nbsp;
-                  {badge && <span className={`badge ${badge.cls}`}>{badge.text}</span>}
-                </div>
-              </div>
-            );
-          })}
-          <p className="note">These are indicative figures only. True comps analysis requires a curated peer group.</p>
-        </div>
-      </div>
-    </>
-  );
-}
-
-// ── DDM TAB ───────────────────────────────────────────────────────────────────
-function DDMTab({ data, assumptions, updateAssumption }) {
-  const result = calcDDM(data, assumptions);
-  const u = result ? upside(result.value, data.currentPrice) : null;
-  const badge = upsideLabel(u);
-
-  const hasDividend = data.dividendRate && data.dividendRate > 0;
-
-  const growthData = hasDividend ? Array.from({length: 10}, (_, i) => ({
-    year: `Y${i+1}`,
-    dividend: data.dividendRate * Math.pow(1 + assumptions.ddmGrowth / 100, i + 1)
-  })) : [];
-
-  return (
-    <div className="grid-2">
-      <div>
-        <div className="card">
-          <div className="card-title">Gordon Growth Model (DDM)</div>
-          {!hasDividend ? (
-            <div>
-              <div className="status-bar warning" style={{margin:'8px 0'}}>⚠ {data.name} does not pay a dividend — DDM is not applicable.</div>
-              <p className="note">DDM is best suited for mature, dividend-paying companies such as utilities, consumer staples, and large financials. Consider DCF or Comps for this stock.</p>
-            </div>
-          ) : (
-            <>
-              <table className="data-table" style={{marginBottom: 16}}>
-                <tbody>
-                  {[
-                    ['Annual Dividend (D₀)', fmtPrice(data.dividendRate)],
-                    ['Dividend Yield', fmtPct(data.dividendYield)],
-                    ['Payout Ratio', fmtPct(data.payoutRatio)],
-                  ].map(([l,v]) => (
-                    <tr key={l}><td className="label">{l}</td><td className="num">{v}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="assumption-grid">
-                <div className="assumption-field">
-                  <label>Cost of Equity / Ke (%)</label>
-                  <input type="number" step="0.5" value={assumptions.costOfEquity}
-                    onChange={e => updateAssumption('costOfEquity', e.target.value)} />
-                </div>
-                <div className="assumption-field">
-                  <label>Dividend Growth Rate (%)</label>
-                  <input type="number" step="0.5" value={assumptions.ddmGrowth}
-                    onChange={e => updateAssumption('ddmGrowth', e.target.value)} />
-                </div>
-              </div>
-              {result ? (
-                <div className="val-result">
-                  <div className="val-label">DDM Intrinsic Value / Share</div>
-                  <div className="val-price">{fmtPrice(result.value)}</div>
-                  <div className="val-upside">
-                    D₁ {fmtPrice(result.d1)} / (Ke {(result.ke*100).toFixed(1)}% − g {(result.g*100).toFixed(1)}%) &nbsp;
-                    {badge && <span className={`badge ${badge.cls}`}>{badge.text}</span>}
-                  </div>
-                </div>
-              ) : (
-                <div className="status-bar error" style={{marginTop:12}}>⚠ Ke must be greater than g for DDM to work.</div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-      <div>
-        {hasDividend && growthData.length > 0 && (
-          <div className="card">
-            <div className="card-title">Projected Dividend Stream (10yr)</div>
-            <div className="chart-wrap">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={growthData} margin={{top:5, right:20, left:0, bottom:5}}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
-                  <XAxis dataKey="year" tick={{fill:'#6b6b8a', fontSize:11}} />
-                  <YAxis tickFormatter={v => `$${v.toFixed(2)}`} tick={{fill:'#6b6b8a', fontSize:11}} />
-                  <Tooltip formatter={v => `$${v.toFixed(3)}`} contentStyle={{background:'#17171f', border:'1px solid #2a2a3a', borderRadius:0}} />
-                  <Line type="monotone" dataKey="dividend" stroke="#e8ff47" strokeWidth={2} dot={{fill:'#e8ff47', r:3}} name="Dividend" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="note">DDM is highly sensitive to the difference between Ke and g. A 1% change in either can swing the valuation significantly.</p>
+  return `<div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-title">Gordon Growth Model (P = D₁ / Ke − g)</div>
+        <table class="dt" style="margin-bottom:14px"><tbody>
+          ${rows([
+            ['Annual Dividend (D₀)', fmtP(D.divRate)],
+            ['Dividend Yield', fmtPct(D.divYield)],
+            ['Payout Ratio', fmtPct(D.payoutRatio)],
+          ])}
+        </tbody></table>
+        <div class="asgrid">
+          <div class="asfield">
+            <label>Cost of Equity / Ke (%)</label>
+            <input type="number" step="0.5" value="${A.ke}" onchange="A.ke=parseFloat(this.value)||0;renderDDM();">
           </div>
-        )}
+          <div class="asfield">
+            <label>Dividend Growth Rate (%)</label>
+            <input type="number" step="0.5" value="${A.dg}" onchange="A.dg=parseFloat(this.value)||0;renderDDM();">
+          </div>
+        </div>
+        ${valid ? `
+        <div class="vr">
+          <div class="vr-lbl">DDM Intrinsic Value / Share</div>
+          <div class="vr-price">${fmtP(val)}</div>
+          <div class="vr-sub">D₁ ${fmtP(d1)} / (${(ke*100).toFixed(1)}% − ${(g*100).toFixed(1)}%) &nbsp; ${upsideBadge(val,D.price)}</div>
+        </div>` : `<div class="status err">⚠ Ke must be greater than g.</div>`}
       </div>
     </div>
-  );
+    <div class="card">
+      <div class="card-title">Projected Dividend Stream (10yr)</div>
+      ${svgLine(growData,'div','#e8ff47')}
+      <p class="note">DDM is highly sensitive to the Ke − g spread. A 1% change in either can move the implied value dramatically.</p>
+    </div>
+  </div>`;
 }
 
-// ── ASSET-BASED TAB ───────────────────────────────────────────────────────────
-function AssetTab({ data }) {
-  const latest = data.balanceHistory?.[data.balanceHistory.length - 1] || {};
-  const shares = data.sharesOutstanding;
+// ── ASSETS ────────────────────────────────────────────────────────────────────
+function renderAssets(){
+  const pb=D.pb, bv=D.bookVal, price=D.price;
+  const deRatio=D.debt&&D.bookVal&&D.shares ? D.debt/(D.bookVal*D.shares) : null;
+  const cashRatio=D.cash&&D.marketCap ? D.cash/D.marketCap : null;
 
-  const navPerShare = data.bookValue;
-  const price = data.currentPrice;
-  const pb = data.pbRatio;
-
-  const u = navPerShare && price ? upside(navPerShare, price) : null;
-  const badge = upsideLabel(u);
-
-  return (
-    <>
-      <div className="grid-2">
-        <div className="card">
-          <div className="card-title">Book Value Analysis</div>
-          <table className="data-table">
-            <tbody>
-              {[
-                ['Book Value / Share', fmtPrice(data.bookValue)],
-                ['Current Price', fmtPrice(data.currentPrice)],
-                ['Price-to-Book (P/B)', fmtMult(data.pbRatio)],
-                ['Total Cash', fmtB(data.totalCash)],
-                ['Total Debt', fmtB(data.totalDebt)],
-                ['Net Cash / (Debt)', fmtB((data.totalCash || 0) - (data.totalDebt || 0))],
-              ].map(([l,v]) => (
-                <tr key={l}><td className="label">{l}</td><td className="num">{v}</td></tr>
-              ))}
-            </tbody>
-          </table>
-
-          {navPerShare && (
-            <div className="val-result" style={{marginTop:16}}>
-              <div className="val-label">Book Value / Share (NAV Proxy)</div>
-              <div className="val-price">{fmtPrice(navPerShare)}</div>
-              <div className="val-upside">
-                {badge && <span className={`badge ${badge.cls}`}>{badge.text}</span>}
-                {pb && <span style={{color:'var(--muted)', fontSize:12, marginLeft:8}}>Trading at {fmtMult(pb)} book</span>}
-              </div>
-            </div>
-          )}
-          <p className="note">Book value is most meaningful for financials, real estate, and capital-heavy industries. For asset-light or tech companies, intangibles are excluded from book value, making P/B less informative.</p>
-        </div>
-
-        <div>
-          {data.balanceHistory?.length > 0 && (
-            <div className="card">
-              <div className="card-title">Assets vs Liabilities vs Equity (Historical)</div>
-              <div className="chart-wrap">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.balanceHistory} margin={{top:5, right:20, left:0, bottom:5}}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#2a2a3a" />
-                    <XAxis dataKey="year" tick={{fill:'#6b6b8a', fontSize:11}} />
-                    <YAxis tickFormatter={v => fmtB(v)} tick={{fill:'#6b6b8a', fontSize:11}} />
-                    <Tooltip formatter={v => fmtB(v)} contentStyle={{background:'#17171f', border:'1px solid #2a2a3a', borderRadius:0}} />
-                    <Bar dataKey="totalAssets" fill="#47c8ff" name="Total Assets" />
-                    <Bar dataKey="totalLiabilities" fill="#f87171" name="Total Liabilities" />
-                    <Bar dataKey="equity" fill="#e8ff47" name="Equity" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          )}
-          <div className="card" style={{marginTop: 16}}>
-            <div className="card-title">Debt & Leverage</div>
-            {[
-              { label: 'Debt / Equity', value: data.totalDebt && data.bookValue && data.sharesOutstanding
-                  ? (data.totalDebt / (data.bookValue * data.sharesOutstanding) * 100).toFixed(1) + '%'
-                  : 'N/A', pct: data.totalDebt && data.bookValue && data.sharesOutstanding
-                  ? Math.min(data.totalDebt / (data.bookValue * data.sharesOutstanding), 1) * 100
-                  : 0, color: '#f87171' },
-              { label: 'Cash / Market Cap', value: data.totalCash && data.marketCap
-                  ? (data.totalCash / data.marketCap * 100).toFixed(1) + '%'
-                  : 'N/A', pct: data.totalCash && data.marketCap
-                  ? Math.min(data.totalCash / data.marketCap, 1) * 100
-                  : 0, color: '#4ade80' },
-            ].map(g => (
-              <div key={g.label} style={{marginBottom:14}}>
-                <div style={{display:'flex', justifyContent:'space-between', marginBottom:5}}>
-                  <span style={{fontSize:12, color:'var(--muted)'}}>{g.label}</span>
-                  <span style={{fontSize:12}}>{g.value}</span>
-                </div>
-                <div className="gauge-track">
-                  <div className="gauge-fill" style={{width: `${Math.min(g.pct, 100)}%`, background: g.color}} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+  document.getElementById('tab-assets').innerHTML=`
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Book Value / NAV Analysis</div>
+      <table class="dt"><tbody>
+        ${rows([
+          ['Book Value / Share', fmtP(D.bookVal)],
+          ['Current Price', fmtP(D.price)],
+          ['Price-to-Book (P/B)', fmtMx(D.pb)],
+          ['Total Cash', fmtB(D.cash)],
+          ['Total Debt', fmtB(D.debt)],
+          ['Net Cash / (Debt)', fmtB((D.cash||0)-(D.debt||0))],
+        ])}
+      </tbody></table>
+      ${bv ? `
+      <div class="vr">
+        <div class="vr-lbl">Book Value / Share</div>
+        <div class="vr-price">${fmtP(bv)}</div>
+        <div class="vr-sub">${upsideBadge(bv,price)} &nbsp; Trading at ${fmtMx(pb)} book</div>
+      </div>` : ''}
+      <p class="note">Book value is most meaningful for financials, real estate, and capital-heavy industries. Asset-light and tech companies carry significant intangibles off balance sheet, making P/B less informative.</p>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title">Leverage & Liquidity</div>
+        ${deRatio!=null ? `<div class="gauge-wrap">
+          <div class="gauge-row"><span style="font-size:11px;color:var(--muted)">Debt / Equity</span><span style="font-size:11px">${(deRatio*100).toFixed(1)}%</span></div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(deRatio*100,100)}%;background:var(--red)"></div></div>
+        </div>` : ''}
+        ${cashRatio!=null ? `<div class="gauge-wrap" style="margin-top:10px">
+          <div class="gauge-row"><span style="font-size:11px;color:var(--muted)">Cash / Market Cap</span><span style="font-size:11px">${(cashRatio*100).toFixed(1)}%</span></div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:${Math.min(cashRatio*100,100)}%;background:var(--green)"></div></div>
+        </div>` : ''}
       </div>
-    </>
-  );
+      <div class="card">
+        <div class="card-title">Assets vs Liabilities vs Equity</div>
+        ${svgBars(D.balance,['assets','liab','equity'],['#47c8ff','#f87171','#e8ff47'])}
+      </div>
+    </div>
+  </div>`;
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
 </html>
